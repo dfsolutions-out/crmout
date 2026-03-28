@@ -225,8 +225,7 @@ export function EmployeeForm({
   const [photoPreview, setPhotoPreview] = useState<string>("");
 
   const [newDocuments, setNewDocuments] = useState<File[]>([]);
-  const [existingDocuments, setExistingDocuments] =
-    useState<DocumentRow[]>(initialDocuments);
+  const [existingDocuments] = useState<DocumentRow[]>(initialDocuments);
   const [documentsToDelete, setDocumentsToDelete] = useState<string[]>([]);
 
   const [notes, setNotes] = useState<EditableNote[]>(

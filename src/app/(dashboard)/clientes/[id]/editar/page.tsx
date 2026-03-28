@@ -1,5 +1,17 @@
 import { createClient } from "@/src/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import {
+  FilePenLine,
+  Building2,
+  Mail,
+  MapPin,
+  Shield,
+  FileText,
+  ArrowLeft,
+  ArrowRight,
+  
+} from "lucide-react";
 
 type EditarClientePageProps = {
   params: Promise<{
@@ -88,179 +100,343 @@ export default async function EditarClientePage({
   if (error || !cliente) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Editar Cliente</h1>
-        <div className="bg-white border rounded-xl p-6">
-          <p className="text-red-600">Não foi possível carregar o cliente.</p>
+        <div className="rounded-[28px] border border-red-200 bg-white p-8 shadow-sm">
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+            Editar Cliente
+          </h1>
+
+          <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            Não foi possível carregar o cliente.
+          </p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="max-w-5xl space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Editar Cliente</h1>
-        <p className="text-slate-600 mt-2">
-          Atualize os dados do cliente.
-        </p>
-      </div>
+  const clientName = cliente.company_name || cliente.person_name || "Cliente";
 
-      <form action={atualizarCliente} className="bg-white border rounded-2xl p-6 space-y-8">
+  return (
+    <div className="space-y-8">
+      {/* TOPO */}
+      <section className="rounded-[30px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-700">
+              <FilePenLine className="h-4 w-4" />
+              Atualização de cadastro
+            </div>
+
+            <h1 className="text-4xl font-semibold tracking-tight text-slate-900">
+              Editar Cliente
+            </h1>
+
+            <p className="mt-3 text-base leading-7 text-slate-600">
+              Atualize os dados do cliente <span className="font-semibold text-slate-800">{clientName}</span>.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={`/clientes/${cliente.id}`}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <form action={atualizarCliente} className="space-y-8">
         <input type="hidden" name="id" defaultValue={cliente.id} />
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <input
-            name="company_name"
-            defaultValue={cliente.company_name || ""}
-            placeholder="Nome da empresa"
-            className="w-full border rounded-xl px-4 py-3"
+        {/* IDENTIFICAÇÃO */}
+        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <SectionHeader
+            title="Identificação"
+            description="Dados principais do cliente e responsáveis."
+            icon={<Building2 className="h-5 w-5" />}
           />
-          <input
-            name="person_name"
-            defaultValue={cliente.person_name || ""}
-            placeholder="Contato / nome"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="cnpj"
-            defaultValue={cliente.cnpj || ""}
-            placeholder="CNPJ"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="cpf"
-            defaultValue={cliente.cpf || ""}
-            placeholder="CPF"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="responsible_1"
-            defaultValue={cliente.responsible_1 || ""}
-            placeholder="Responsável 1"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="responsible_2"
-            defaultValue={cliente.responsible_2 || ""}
-            placeholder="Responsável 2"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="email_1"
-            defaultValue={cliente.email_1 || ""}
-            placeholder="Email 1"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="email_2"
-            defaultValue={cliente.email_2 || ""}
-            placeholder="Email 2"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="phone_1"
-            defaultValue={cliente.phone_1 || ""}
-            placeholder="Telefone 1"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="phone_2"
-            defaultValue={cliente.phone_2 || ""}
-            placeholder="Telefone 2"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="zip_code"
-            defaultValue={cliente.zip_code || ""}
-            placeholder="CEP"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="street"
-            defaultValue={cliente.street || ""}
-            placeholder="Logradouro"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="number"
-            defaultValue={cliente.number || ""}
-            placeholder="Número"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="complement"
-            defaultValue={cliente.complement || ""}
-            placeholder="Complemento"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="district"
-            defaultValue={cliente.district || ""}
-            placeholder="Bairro"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="city"
-            defaultValue={cliente.city || ""}
-            placeholder="Cidade"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="state"
-            defaultValue={cliente.state || ""}
-            placeholder="Estado"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            type="date"
-            name="registration_date"
-            defaultValue={cliente.registration_date || ""}
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <select
-            name="is_active"
-            defaultValue={cliente.is_active ? "true" : "false"}
-            className="w-full border rounded-xl px-4 py-3"
-          >
-            <option value="true">Ativo</option>
-            <option value="false">Inativo</option>
-          </select>
-          <input
-            name="password_main"
-            defaultValue={cliente.password_main || ""}
-            placeholder="Senha boa"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="password_counter"
-            defaultValue={cliente.password_counter || ""}
-            placeholder="Contra-senha"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-          <input
-            name="password_panic"
-            defaultValue={cliente.password_panic || ""}
-            placeholder="Senha pânico"
-            className="w-full border rounded-xl px-4 py-3"
-          />
-        </div>
 
-        <textarea
-          name="observations"
-          defaultValue={cliente.observations || ""}
-          placeholder="Observações"
-          className="w-full border rounded-xl px-4 py-3 min-h-32"
-        />
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field
+              name="company_name"
+              defaultValue={cliente.company_name || ""}
+              placeholder="Nome da empresa"
+            />
 
-        <div className="flex gap-3">
-          <button
-            type="submit"
-            className="bg-slate-900 text-white px-6 py-3 rounded-xl"
-          >
-            Salvar alterações
-          </button>
-        </div>
+            <Field
+              name="person_name"
+              defaultValue={cliente.person_name || ""}
+              placeholder="Contato / nome"
+            />
+
+            <Field
+              name="cnpj"
+              defaultValue={cliente.cnpj || ""}
+              placeholder="CNPJ"
+            />
+
+            <Field
+              name="cpf"
+              defaultValue={cliente.cpf || ""}
+              placeholder="CPF"
+            />
+
+            <Field
+              name="responsible_1"
+              defaultValue={cliente.responsible_1 || ""}
+              placeholder="Responsável 1"
+            />
+
+            <Field
+              name="responsible_2"
+              defaultValue={cliente.responsible_2 || ""}
+              placeholder="Responsável 2"
+            />
+          </div>
+        </section>
+
+        {/* CONTATO */}
+        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <SectionHeader
+            title="Contato"
+            description="Emails e telefones principais."
+            icon={<Mail className="h-5 w-5" />}
+          />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field
+              name="email_1"
+              defaultValue={cliente.email_1 || ""}
+              placeholder="Email 1"
+              type="email"
+            />
+
+            <Field
+              name="email_2"
+              defaultValue={cliente.email_2 || ""}
+              placeholder="Email 2"
+              type="email"
+            />
+
+            <Field
+              name="phone_1"
+              defaultValue={cliente.phone_1 || ""}
+              placeholder="Telefone 1"
+            />
+
+            <Field
+              name="phone_2"
+              defaultValue={cliente.phone_2 || ""}
+              placeholder="Telefone 2"
+            />
+          </div>
+        </section>
+
+        {/* ENDEREÇO */}
+        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <SectionHeader
+            title="Endereço"
+            description="Informações de localização do cliente."
+            icon={<MapPin className="h-5 w-5" />}
+          />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field
+              name="zip_code"
+              defaultValue={cliente.zip_code || ""}
+              placeholder="CEP"
+            />
+
+            <Field
+              name="street"
+              defaultValue={cliente.street || ""}
+              placeholder="Logradouro"
+            />
+
+            <Field
+              name="number"
+              defaultValue={cliente.number || ""}
+              placeholder="Número"
+            />
+
+            <Field
+              name="complement"
+              defaultValue={cliente.complement || ""}
+              placeholder="Complemento"
+            />
+
+            <Field
+              name="district"
+              defaultValue={cliente.district || ""}
+              placeholder="Bairro"
+            />
+
+            <Field
+              name="city"
+              defaultValue={cliente.city || ""}
+              placeholder="Cidade"
+            />
+
+            <Field
+              name="state"
+              defaultValue={cliente.state || ""}
+              placeholder="Estado"
+            />
+          </div>
+        </section>
+
+        {/* CADASTRO E CREDENCIAIS */}
+        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <SectionHeader
+            title="Cadastro e credenciais"
+            description="Status do cadastro, data de inclusão e senhas."
+            icon={<Shield className="h-5 w-5" />}
+          />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Data da inclusão
+              </label>
+              <input
+                type="date"
+                name="registration_date"
+                defaultValue={cliente.registration_date || ""}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">
+                Status
+              </label>
+              <select
+                name="is_active"
+                defaultValue={cliente.is_active ? "true" : "false"}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+              >
+                <option value="true">Ativo</option>
+                <option value="false">Inativo</option>
+              </select>
+            </div>
+
+            <Field
+              name="password_main"
+              defaultValue={cliente.password_main || ""}
+              placeholder="Senha boa"
+            />
+
+            <Field
+              name="password_counter"
+              defaultValue={cliente.password_counter || ""}
+              placeholder="Contra-senha"
+            />
+
+            <Field
+              name="password_panic"
+              defaultValue={cliente.password_panic || ""}
+              placeholder="Senha pânico"
+            />
+          </div>
+        </section>
+
+        {/* OBSERVAÇÕES */}
+        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <SectionHeader
+            title="Observações"
+            description="Notas e informações gerais sobre o cliente."
+            icon={<FileText className="h-5 w-5" />}
+          />
+
+          <textarea
+            name="observations"
+            defaultValue={cliente.observations || ""}
+            placeholder="Observações"
+            className="min-h-36 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+          />
+        </section>
+
+        {/* AÇÕES */}
+        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900">
+                Salvar alterações
+              </h3>
+              <p className="mt-1 text-sm text-slate-500">
+                Revise os campos e confirme a atualização do cadastro.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                href={`/clientes/${cliente.id}`}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Cancelar
+              </Link>
+
+              <button
+                type="submit"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#12325F] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-95"
+              >
+                Salvar alterações
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </section>
       </form>
     </div>
+  );
+}
+
+function SectionHeader({
+  title,
+  description,
+  icon,
+}: {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="mb-5 flex items-start justify-between gap-4">
+      <div>
+        <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+          {title}
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">{description}</p>
+      </div>
+
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+        {icon}
+      </div>
+    </div>
+  );
+}
+
+function Field({
+  name,
+  defaultValue,
+  placeholder,
+  type = "text",
+}: {
+  name: string;
+  defaultValue: string;
+  placeholder: string;
+  type?: string;
+}) {
+  return (
+    <input
+      name={name}
+      defaultValue={defaultValue}
+      placeholder={placeholder}
+      type={type}
+      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+    />
   );
 }

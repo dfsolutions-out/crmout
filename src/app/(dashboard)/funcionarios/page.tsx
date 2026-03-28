@@ -1,5 +1,15 @@
 import Link from "next/link";
 import { createClient } from "@/src/lib/supabase/server";
+import {
+  Users,
+  Plus,
+  Search,
+  ArrowRight,
+  UserSquare2,
+  ClipboardList,
+  ShieldCheck,
+  
+} from "lucide-react";
 
 type SearchParams = {
   q?: string;
@@ -43,9 +53,12 @@ export default async function FuncionariosPage({
   if (membershipError || !membership) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Funcionários</h1>
-        <div className="bg-white border rounded-xl p-6">
-          <p className="text-red-600">
+        <div className="rounded-[28px] border border-red-200 bg-white p-8 shadow-sm">
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
+            Funcionários
+          </h1>
+
+          <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
             Empresa não encontrada para este usuário.
           </p>
         </div>
@@ -75,130 +88,297 @@ export default async function FuncionariosPage({
         `workplace.ilike.%${q}%`,
         `city.ilike.%${q}%`,
         `state.ilike.%${q}%`,
-      ].join(",")
+      ].join(","),
     );
   }
 
   const { data: funcionarios, error } = await query;
-
   const funcionariosTyped = (funcionarios ?? []) as EmployeeRow[];
 
+  const totalFuncionarios = funcionariosTyped.length;
+  const totalAtivos = funcionariosTyped.filter((f) => f.is_active !== false).length;
+  const totalInativos = funcionariosTyped.filter((f) => f.is_active === false).length;
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <h1 className="text-3xl font-bold">Funcionários</h1>
+    <div className="space-y-8">
+      <section className="rounded-[30px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-700">
+              <Users className="h-4 w-4" />
+              Gestão de funcionários
+            </div>
 
-        <Link
-          href="/funcionarios/novo"
-          className="bg-slate-900 text-white px-5 py-3 rounded-xl"
-        >
-          Novo Funcionário
-        </Link>
-      </div>
+            <h1 className="text-4xl font-semibold tracking-tight text-slate-900">
+              Funcionários
+            </h1>
 
-      <form className="bg-white border rounded-2xl p-4 grid gap-4 md:grid-cols-[1fr_220px_140px]">
-        <input
-          type="text"
-          name="q"
-          defaultValue={q}
-          placeholder="Pesquisar por nome, CPF, RG, email, telefone, função, local..."
-          className="w-full border rounded-xl px-4 py-3"
+            <p className="mt-3 text-base leading-7 text-slate-600">
+              Gerencie a equipe, acompanhe o status dos cadastros e acesse ações
+              operacionais rapidamente.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/folha-ponto"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              <ClipboardList className="h-4 w-4" />
+              Folha de ponto
+            </Link>
+
+            <Link
+              href="/funcionarios/novo"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#12325F] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-95"
+            >
+              <Plus className="h-4 w-4" />
+              Novo funcionário
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <SummaryCard
+          title="Total de funcionários"
+          value={String(totalFuncionarios)}
+          subtitle="Registros encontrados"
+          icon={<UserSquare2 className="h-5 w-5" />}
         />
 
-        <select
-          name="status"
-          defaultValue={status}
-          className="w-full border rounded-xl px-4 py-3"
-        >
-          <option value="todos">Todos</option>
-          <option value="ativos">Ativos</option>
-          <option value="inativos">Inativos</option>
-        </select>
+        <SummaryCard
+          title="Funcionários ativos"
+          value={String(totalAtivos)}
+          subtitle="Equipe em atividade"
+          icon={<ShieldCheck className="h-5 w-5" />}
+        />
 
-        <button
-          type="submit"
-          className="bg-slate-900 text-white rounded-xl px-4 py-3"
-        >
-          Buscar
-        </button>
-      </form>
+        <SummaryCard
+          title="Funcionários inativos"
+          value={String(totalInativos)}
+          subtitle="Cadastros inativos"
+          icon={<Users className="h-5 w-5" />}
+          valueClassName={totalInativos > 0 ? "text-amber-600" : "text-slate-900"}
+        />
+      </section>
 
-      <div className="bg-white border rounded-2xl overflow-hidden">
-        <table className="w-full">
-          <thead className="border-b bg-slate-50">
-            <tr className="text-left text-sm text-slate-600">
-              <th className="p-4">Nome</th>
-              <th>CPF</th>
-              <th>Função</th>
-              <th>Status</th>
-              <th className="w-[420px]">Ações</th>
-            </tr>
-          </thead>
+      <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
+        <form className="grid gap-4 xl:grid-cols-[1.4fr_220px_160px]">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Buscar
+            </label>
 
-          <tbody>
-            {!error && funcionariosTyped.length > 0 ? (
-              funcionariosTyped.map((funcionario) => (
-                <tr key={funcionario.id} className="border-b last:border-b-0">
-                  <td className="p-4">{funcionario.full_name || "-"}</td>
-                  <td>{funcionario.cpf || "-"}</td>
-                  <td>{funcionario.job_title || "-"}</td>
-                  <td>{funcionario.is_active ? "Ativo" : "Inativo"}</td>
-                  <td className="py-4 pr-4">
-                    <div className="flex flex-wrap gap-3">
-                      <Link
-                        href={`/funcionarios/${funcionario.id}`}
-                        className="text-blue-600 hover:underline"
-                      >
-                        Abrir
-                      </Link>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                name="q"
+                defaultValue={q}
+                placeholder="Pesquisar por nome, CPF, RG, email, telefone, função, local..."
+                className="w-full rounded-2xl border border-slate-200 bg-white px-11 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+              />
+            </div>
+          </div>
 
-                      <Link
-                        href={`/funcionarios/${funcionario.id}/editar`}
-                        className="text-amber-600 hover:underline"
-                      >
-                        Editar
-                      </Link>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Status
+            </label>
 
-                      <Link
-                        href={`/funcionarios/${funcionario.id}/entregas`}
-                        className="text-emerald-600 hover:underline"
-                      >
-                        Entregas
-                      </Link>
+            <select
+              name="status"
+              defaultValue={status}
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            >
+              <option value="todos">Todos</option>
+              <option value="ativos">Ativos</option>
+              <option value="inativos">Inativos</option>
+            </select>
+          </div>
 
-                      <Link
-                        href={`/funcionarios/${funcionario.id}/entregas/nova`}
-                        className="text-violet-600 hover:underline"
-                      >
-                        Nova entrega
-                      </Link>
+          <div className="flex items-end">
+            <button
+              type="submit"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#12325F] px-4 py-3.5 text-sm font-semibold text-white transition hover:opacity-95"
+            >
+              Buscar
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </form>
+      </section>
 
-                      <form
-                        action={`/funcionarios/${funcionario.id}/excluir`}
-                        method="post"
-                      >
-                        <button
-                          type="submit"
-                          className="text-red-600 hover:underline"
+      <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-5">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+              Lista de funcionários
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Visualize os principais dados e acesse as ações operacionais.
+            </p>
+          </div>
+
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+            <Users className="h-5 w-5" />
+          </div>
+        </div>
+
+        <div className="overflow-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50/80">
+              <tr className="text-left text-slate-600">
+                <th className="px-4 py-3 font-semibold">Funcionário</th>
+                <th className="px-4 py-3 font-semibold">CPF</th>
+                <th className="px-4 py-3 font-semibold">Função</th>
+                <th className="px-4 py-3 font-semibold">Status</th>
+                <th className="px-4 py-3 text-right font-semibold">Ações</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {!error && funcionariosTyped.length > 0 ? (
+                funcionariosTyped.map((funcionario) => {
+                  const ativo = funcionario.is_active !== false;
+
+                  return (
+                    <tr
+                      key={funcionario.id}
+                      className="border-t border-slate-100 transition hover:bg-slate-50/70"
+                    >
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                            <UserSquare2 className="h-4 w-4" />
+                          </div>
+
+                          <div className="min-w-0">
+                            <p className="truncate font-semibold text-slate-900">
+                              {funcionario.full_name || "-"}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              Cadastro de funcionário
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="px-4 py-4 text-slate-600">
+                        {funcionario.cpf || "-"}
+                      </td>
+
+                      <td className="px-4 py-4 text-slate-600">
+                        {funcionario.job_title || "-"}
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <span
+                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                            ativo
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
                         >
-                          Excluir
-                        </button>
-                      </form>
-                    </div>
+                          {ativo ? "Ativo" : "Inativo"}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <div className="flex flex-wrap justify-end gap-2">
+                          <Link
+                            href={`/funcionarios/${funcionario.id}`}
+                            className="inline-flex items-center rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100"
+                          >
+                            Abrir
+                          </Link>
+
+                          <Link
+                            href={`/funcionarios/${funcionario.id}/editar`}
+                            className="inline-flex items-center rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-100"
+                          >
+                            Editar
+                          </Link>
+
+                          <Link
+                            href={`/funcionarios/${funcionario.id}/entregas`}
+                            className="inline-flex items-center rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100"
+                          >
+                            Entregas
+                          </Link>
+
+                          <Link
+                            href={`/funcionarios/${funcionario.id}/entregas/nova`}
+                            className="inline-flex items-center rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-700 transition hover:bg-violet-100"
+                          >
+                            Nova entrega
+                          </Link>
+
+                          <form
+                            action={`/funcionarios/${funcionario.id}/excluir`}
+                            method="post"
+                          >
+                            <button
+                              type="submit"
+                              className="inline-flex items-center rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100"
+                            >
+                              Excluir
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                    {error
+                      ? "Erro ao carregar funcionários."
+                      : "Nenhum funcionário encontrado."}
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={5} className="p-6 text-center text-slate-500">
-                  {error
-                    ? "Erro ao carregar funcionários."
-                    : "Nenhum funcionário encontrado."}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function SummaryCard({
+  title,
+  value,
+  subtitle,
+  icon,
+  valueClassName,
+}: {
+  title: string;
+  value: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-slate-500">{title}</p>
+          <p
+            className={`mt-3 text-4xl font-semibold tracking-tight text-slate-900 ${
+              valueClassName || ""
+            }`}
+          >
+            {value}
+          </p>
+          <p className="mt-2 text-sm text-slate-500">{subtitle}</p>
+        </div>
+
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-50 text-slate-700">
+          {icon}
+        </div>
       </div>
     </div>
   );

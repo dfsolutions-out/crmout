@@ -3,6 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/client";
+import {
+  UserPlus,
+  Building2,
+  User,
+  Mail,
+  MapPin,
+  Shield,
+  FileText,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 
 type ClienteTipo = "PJ" | "PF";
 
@@ -219,286 +230,437 @@ export default function NovoClientePage() {
   }
 
   return (
-    <div className="max-w-5xl space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Novo Cliente</h1>
-        <p className="text-slate-600 mt-2">Cadastre um novo cliente no sistema.</p>
-      </div>
+    <div className="space-y-8">
+      {/* TOPO */}
+      <section className="rounded-[30px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-700">
+              <UserPlus className="h-4 w-4" />
+              Cadastro de cliente
+            </div>
 
-      <div className="bg-white border rounded-2xl p-6 space-y-8">
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Tipo de cliente</h2>
+            <h1 className="text-4xl font-semibold tracking-tight text-slate-900">
+              Novo Cliente
+            </h1>
 
-          <div className="grid md:grid-cols-2 gap-4">
+            <p className="mt-3 text-base leading-7 text-slate-600">
+              Preencha os dados do cliente para cadastrar um novo registro no sistema.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={() => handleChangeTipo("PJ")}
-              className={`rounded-xl border px-4 py-3 text-left ${
-                type === "PJ"
-                  ? "bg-slate-900 text-white border-slate-900"
-                  : "bg-white text-slate-900"
-              }`}
+              onClick={() => router.push("/clientes")}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
-              Pessoa Jurídica
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleChangeTipo("PF")}
-              className={`rounded-xl border px-4 py-3 text-left ${
-                type === "PF"
-                  ? "bg-slate-900 text-white border-slate-900"
-                  : "bg-white text-slate-900"
-              }`}
-            >
-              Pessoa Física
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
             </button>
           </div>
         </div>
+      </section>
 
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Identificação</h2>
+      {/* TIPO */}
+      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+              Tipo de cliente
+            </h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Escolha se o cadastro será de pessoa jurídica ou física.
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
             {type === "PJ" ? (
-              <input
-                className="w-full border rounded-xl px-4 py-3"
-                placeholder="Nome da empresa"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-              />
+              <Building2 className="h-5 w-5" />
             ) : (
-              <input
-                className="w-full border rounded-xl px-4 py-3"
-                placeholder="Nome completo"
-                value={personName}
-                onChange={(e) => setPersonName(e.target.value)}
-              />
+              <User className="h-5 w-5" />
             )}
+          </div>
+        </div>
 
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder={type === "PJ" ? "Contato / nome de referência" : "Nome de referência"}
+        <div className="grid gap-4 md:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => handleChangeTipo("PJ")}
+            className={`rounded-2xl border px-5 py-4 text-left transition ${
+              type === "PJ"
+                ? "border-[#12325F] bg-[#12325F] text-white shadow-sm"
+                : "border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <Building2 className="h-5 w-5" />
+              <div>
+                <p className="font-semibold">Pessoa Jurídica</p>
+                <p
+                  className={`mt-1 text-sm ${
+                    type === "PJ" ? "text-blue-100" : "text-slate-500"
+                  }`}
+                >
+                  Empresas e organizações
+                </p>
+              </div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleChangeTipo("PF")}
+            className={`rounded-2xl border px-5 py-4 text-left transition ${
+              type === "PF"
+                ? "border-[#12325F] bg-[#12325F] text-white shadow-sm"
+                : "border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <User className="h-5 w-5" />
+              <div>
+                <p className="font-semibold">Pessoa Física</p>
+                <p
+                  className={`mt-1 text-sm ${
+                    type === "PF" ? "text-blue-100" : "text-slate-500"
+                  }`}
+                >
+                  Clientes individuais
+                </p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      {/* IDENTIFICAÇÃO */}
+      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <SectionHeader
+          title="Identificação"
+          description="Dados principais do cliente e responsáveis."
+          icon={<Building2 className="h-5 w-5" />}
+        />
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {type === "PJ" ? (
+            <Field
+              placeholder="Nome da empresa"
+              value={companyName}
+              onChange={setCompanyName}
+            />
+          ) : (
+            <Field
+              placeholder="Nome completo"
               value={personName}
-              onChange={(e) => setPersonName(e.target.value)}
+              onChange={setPersonName}
             />
+          )}
 
-            {type === "PJ" ? (
-              <input
-                className="w-full border rounded-xl px-4 py-3"
-                placeholder="CNPJ"
-                value={cnpj}
-                onChange={(e) => setCnpj(maskCNPJ(e.target.value))}
-                inputMode="numeric"
-              />
-            ) : (
-              <input
-                className="w-full border rounded-xl px-4 py-3"
-                placeholder="CPF"
-                value={cpf}
-                onChange={(e) => setCpf(maskCPF(e.target.value))}
-                inputMode="numeric"
-              />
-            )}
+          <Field
+            placeholder={
+              type === "PJ"
+                ? "Contato / nome de referência"
+                : "Nome de referência"
+            }
+            value={personName}
+            onChange={setPersonName}
+          />
 
-            {type === "PJ" ? (
-              <input
-                className="w-full border rounded-xl px-4 py-3"
-                placeholder="Responsável 1"
-                value={responsible1}
-                onChange={(e) => setResponsible1(e.target.value)}
-              />
-            ) : (
-              <div />
-            )}
-
-            {type === "PJ" ? (
-              <input
-                className="w-full border rounded-xl px-4 py-3"
-                placeholder="Responsável 2"
-                value={responsible2}
-                onChange={(e) => setResponsible2(e.target.value)}
-              />
-            ) : (
-              <div />
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Contato</h2>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Email 1"
-              value={email1}
-              onChange={(e) => setEmail1(e.target.value)}
-              type="email"
-            />
-
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Email 2"
-              value={email2}
-              onChange={(e) => setEmail2(e.target.value)}
-              type="email"
-            />
-
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Telefone 1"
-              value={phone1}
-              onChange={(e) => setPhone1(maskPhone(e.target.value))}
+          {type === "PJ" ? (
+            <Field
+              placeholder="CNPJ"
+              value={cnpj}
+              onChange={(value) => setCnpj(maskCNPJ(value))}
               inputMode="numeric"
             />
-
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Telefone 2"
-              value={phone2}
-              onChange={(e) => setPhone2(maskPhone(e.target.value))}
+          ) : (
+            <Field
+              placeholder="CPF"
+              value={cpf}
+              onChange={(value) => setCpf(maskCPF(value))}
               inputMode="numeric"
             />
-          </div>
+          )}
+
+          {type === "PJ" ? (
+            <Field
+              placeholder="Responsável 1"
+              value={responsible1}
+              onChange={setResponsible1}
+            />
+          ) : (
+            <div />
+          )}
+
+          {type === "PJ" ? (
+            <Field
+              placeholder="Responsável 2"
+              value={responsible2}
+              onChange={setResponsible2}
+            />
+          ) : (
+            <div />
+          )}
         </div>
+      </section>
 
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Endereço</h2>
+      {/* CONTATO */}
+      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <SectionHeader
+          title="Contato"
+          description="Emails e telefones principais do cliente."
+          icon={<Mail className="h-5 w-5" />}
+        />
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <input
-                className="w-full border rounded-xl px-4 py-3"
-                placeholder="CEP"
-                value={zipCode}
-                onChange={(e) => setZipCode(maskCEP(e.target.value))}
-                onBlur={handleCepBlur}
-                inputMode="numeric"
-              />
-              {searchingCep ? (
-                <p className="text-xs text-slate-500">Buscando endereço pelo CEP...</p>
-              ) : null}
-            </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field
+            placeholder="Email 1"
+            value={email1}
+            onChange={setEmail1}
+            type="email"
+          />
 
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Logradouro"
-              value={street}
-              onChange={(e) => setStreet(e.target.value)}
-            />
+          <Field
+            placeholder="Email 2"
+            value={email2}
+            onChange={setEmail2}
+            type="email"
+          />
 
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Número"
-              value={number}
-              onChange={(e) => setNumber(onlyDigits(e.target.value).slice(0, 10))}
-              inputMode="numeric"
-            />
+          <Field
+            placeholder="Telefone 1"
+            value={phone1}
+            onChange={(value) => setPhone1(maskPhone(value))}
+            inputMode="numeric"
+          />
 
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Complemento"
-              value={complement}
-              onChange={(e) => setComplement(e.target.value)}
-            />
-
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Bairro"
-              value={district}
-              onChange={(e) => setDistrict(e.target.value)}
-            />
-
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Cidade"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
-
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Estado"
-              value={state}
-              onChange={(e) => setState(maskUF(e.target.value))}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Cadastro e credenciais</h2>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm text-slate-700">Data da inclusão</label>
-              <input
-                type="date"
-                className="w-full border rounded-xl px-4 py-3"
-                value={registrationDate}
-                onChange={(e) => setRegistrationDate(e.target.value)}
-              />
-            </div>
-
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Senha boa"
-              value={passwordMain}
-              onChange={(e) => setPasswordMain(e.target.value)}
-            />
-
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Contra-senha"
-              value={passwordCounter}
-              onChange={(e) => setPasswordCounter(e.target.value)}
-            />
-
-            <input
-              className="w-full border rounded-xl px-4 py-3"
-              placeholder="Senha pânico"
-              value={passwordPanic}
-              onChange={(e) => setPasswordPanic(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Observações</h2>
-
-          <textarea
-            className="w-full border rounded-xl px-4 py-3 min-h-32"
-            placeholder="Observações gerais do cliente"
-            value={observations}
-            onChange={(e) => setObservations(e.target.value)}
+          <Field
+            placeholder="Telefone 2"
+            value={phone2}
+            onChange={(value) => setPhone2(maskPhone(value))}
+            inputMode="numeric"
           />
         </div>
+      </section>
 
-        {error ? (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
+      {/* ENDEREÇO */}
+      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <SectionHeader
+          title="Endereço"
+          description="Dados de localização e preenchimento por CEP."
+          icon={<MapPin className="h-5 w-5" />}
+        />
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Field
+              placeholder="CEP"
+              value={zipCode}
+              onChange={(value) => setZipCode(maskCEP(value))}
+              onBlur={handleCepBlur}
+              inputMode="numeric"
+            />
+
+            {searchingCep ? (
+              <p className="text-xs text-slate-500">
+                Buscando endereço pelo CEP...
+              </p>
+            ) : null}
           </div>
-        ) : null}
 
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={criarCliente}
-            disabled={loading}
-            className="bg-slate-900 text-white px-6 py-3 rounded-xl disabled:opacity-60"
-          >
-            {loading ? "Salvando..." : "Criar Cliente"}
-          </button>
+          <Field
+            placeholder="Logradouro"
+            value={street}
+            onChange={setStreet}
+          />
 
-          <button
-            type="button"
-            onClick={() => router.push("/clientes")}
-            className="border px-6 py-3 rounded-xl"
-          >
-            Cancelar
-          </button>
+          <Field
+            placeholder="Número"
+            value={number}
+            onChange={(value) =>
+              setNumber(onlyDigits(value).slice(0, 10))
+            }
+            inputMode="numeric"
+          />
+
+          <Field
+            placeholder="Complemento"
+            value={complement}
+            onChange={setComplement}
+          />
+
+          <Field
+            placeholder="Bairro"
+            value={district}
+            onChange={setDistrict}
+          />
+
+          <Field
+            placeholder="Cidade"
+            value={city}
+            onChange={setCity}
+          />
+
+          <Field
+            placeholder="Estado"
+            value={state}
+            onChange={(value) => setState(maskUF(value))}
+          />
         </div>
+      </section>
+
+      {/* CADASTRO E CREDENCIAIS */}
+      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <SectionHeader
+          title="Cadastro e credenciais"
+          description="Data de inclusão e informações adicionais do cliente."
+          icon={<Shield className="h-5 w-5" />}
+        />
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">
+              Data da inclusão
+            </label>
+            <input
+              type="date"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+              value={registrationDate}
+              onChange={(e) => setRegistrationDate(e.target.value)}
+            />
+          </div>
+
+          <Field
+            placeholder="Senha boa"
+            value={passwordMain}
+            onChange={setPasswordMain}
+          />
+
+          <Field
+            placeholder="Contra-senha"
+            value={passwordCounter}
+            onChange={setPasswordCounter}
+          />
+
+          <Field
+            placeholder="Senha pânico"
+            value={passwordPanic}
+            onChange={setPasswordPanic}
+          />
+        </div>
+      </section>
+
+      {/* OBSERVAÇÕES */}
+      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <SectionHeader
+          title="Observações"
+          description="Notas gerais e observações importantes do cliente."
+          icon={<FileText className="h-5 w-5" />}
+        />
+
+        <textarea
+          className="min-h-36 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+          placeholder="Observações gerais do cliente"
+          value={observations}
+          onChange={(e) => setObservations(e.target.value)}
+        />
+      </section>
+
+      {/* ERRO */}
+      {error ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+          {error}
+        </div>
+      ) : null}
+
+      {/* AÇÕES */}
+      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">
+              Finalizar cadastro
+            </h3>
+            <p className="mt-1 text-sm text-slate-500">
+              Revise os dados e confirme para criar o cliente.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => router.push("/clientes")}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              onClick={criarCliente}
+              disabled={loading}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#12325F] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Salvando..." : "Criar Cliente"}
+              {!loading ? <ArrowRight className="h-4 w-4" /> : null}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function SectionHeader({
+  title,
+  description,
+  icon,
+}: {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="mb-5 flex items-start justify-between gap-4">
+      <div>
+        <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+          {title}
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">{description}</p>
+      </div>
+
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+        {icon}
       </div>
     </div>
+  );
+}
+
+function Field({
+  placeholder,
+  value,
+  onChange,
+  type = "text",
+  inputMode,
+  onBlur,
+}: {
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  onBlur?: () => void;
+}) {
+  return (
+    <input
+      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      type={type}
+      inputMode={inputMode}
+      onBlur={onBlur}
+    />
   );
 }

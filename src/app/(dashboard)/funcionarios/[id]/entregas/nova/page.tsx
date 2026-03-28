@@ -1,7 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { PackagePlus, ArrowLeft, ArrowRight } from "lucide-react";
 
 type Product = {
   id: string;
@@ -39,14 +40,11 @@ type DeliveryForm = {
   note: string;
 };
 
-export default function NovaEntregaPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function NovaEntregaPage() {
   const router = useRouter();
+  const params = useParams<{ id: string }>();
+  const employeeId = String(params.id || "");
 
-  const [employeeId, setEmployeeId] = useState("");
   const [employeeName, setEmployeeName] = useState("Carregando...");
   const [products, setProducts] = useState<Product[]>([]);
   const [saving, setSaving] = useState(false);
@@ -56,10 +54,6 @@ export default function NovaEntregaPage({
     quantity: 1,
     note: "",
   });
-
-  useEffect(() => {
-    void params.then((value) => setEmployeeId(value.id));
-  }, [params]);
 
   const loadProducts = useCallback(async () => {
     const res = await fetch("/api/company/products?active=true", {
@@ -135,6 +129,7 @@ export default function NovaEntregaPage({
       }
 
       router.push(`/funcionarios/${employeeId}/entregas`);
+      router.refresh();
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Erro ao registrar entrega.";
@@ -145,73 +140,121 @@ export default function NovaEntregaPage({
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-bold mb-1">Nova entrega</h1>
-      <p className="text-sm text-slate-600 mb-6">
-        Funcionário: <strong>{employeeName}</strong>
-      </p>
+    <div className="space-y-8">
+      <section className="rounded-[30px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-700">
+              <PackagePlus className="h-4 w-4" />
+              Registro de entrega
+            </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border p-6 space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Produto</label>
-          <select
-            required
-            value={form.product_id}
-            onChange={(e) =>
-              setForm((old) => ({ ...old, product_id: e.target.value }))
-            }
-            className="w-full border rounded-xl px-3 py-2"
-          >
-            <option value="">Selecione</option>
-            {products.map((product) => (
-              <option key={product.id} value={product.id}>
-                {product.name} - estoque: {product.stock} {product.unit || "UN"}
-              </option>
-            ))}
-          </select>
-        </div>
+            <h1 className="text-4xl font-semibold tracking-tight text-slate-900">
+              Nova entrega
+            </h1>
 
-        {selectedProduct && (
-          <div className="text-sm text-slate-600">
-            Tipo: <strong>{selectedProduct.type}</strong> • Estoque disponível:{" "}
-            <strong>
-              {selectedProduct.stock} {selectedProduct.unit || "UN"}
-            </strong>
+            <p className="mt-3 text-base leading-7 text-slate-600">
+              Funcionário: <span className="font-semibold text-slate-800">{employeeName}</span>
+            </p>
           </div>
-        )}
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Quantidade</label>
-          <input
-            type="number"
-            min={1}
-            required
-            value={form.quantity}
-            onChange={(e) =>
-              setForm((old) => ({ ...old, quantity: Number(e.target.value) }))
-            }
-            className="w-full border rounded-xl px-3 py-2"
-          />
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => router.push(`/funcionarios/${employeeId}/entregas`)}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm"
+      >
+        <div className="mb-5">
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+            Dados da entrega
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Selecione o produto, informe a quantidade e registre uma observação.
+          </p>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Observação</label>
-          <textarea
-            value={form.note}
-            onChange={(e) => setForm((old) => ({ ...old, note: e.target.value }))}
-            rows={4}
-            className="w-full border rounded-xl px-3 py-2"
-            placeholder="Ex: entrega inicial / reposição / troca"
-          />
-        </div>
+        <div className="grid gap-5">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Produto
+            </label>
+            <select
+              required
+              value={form.product_id}
+              onChange={(e) =>
+                setForm((old) => ({ ...old, product_id: e.target.value }))
+              }
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            >
+              <option value="">Selecione</option>
+              {products.map((product) => (
+                <option key={product.id} value={product.id}>
+                  {product.name} - estoque: {product.stock} {product.unit || "UN"}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-xl bg-blue-600 text-white px-4 py-2 font-medium hover:bg-blue-700 disabled:opacity-60"
-        >
-          {saving ? "Salvando..." : "Registrar entrega"}
-        </button>
+          {selectedProduct ? (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-700">
+              Tipo: <strong>{selectedProduct.type}</strong> • Estoque disponível:{" "}
+              <strong>
+                {selectedProduct.stock} {selectedProduct.unit || "UN"}
+              </strong>
+            </div>
+          ) : null}
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Quantidade
+            </label>
+            <input
+              type="number"
+              min={1}
+              required
+              value={form.quantity}
+              onChange={(e) =>
+                setForm((old) => ({ ...old, quantity: Number(e.target.value) }))
+              }
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Observação
+            </label>
+            <textarea
+              value={form.note}
+              onChange={(e) => setForm((old) => ({ ...old, note: e.target.value }))}
+              rows={5}
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100"
+              placeholder="Ex.: entrega inicial / reposição / troca"
+            />
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={saving}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#12325F] px-6 py-3 text-sm font-semibold text-white transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {saving ? "Salvando..." : "Registrar entrega"}
+              {!saving ? <ArrowRight className="h-4 w-4" /> : null}
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   );
