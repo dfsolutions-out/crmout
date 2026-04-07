@@ -256,8 +256,9 @@ export function EmployeeForm({
 
   useEffect(() => {
     async function loadExistingPhoto() {
-      if (!initialEmployee?.photo_path || photoFile || removeCurrentPhoto)
+      if (!initialEmployee?.photo_path || photoFile || removeCurrentPhoto) {
         return;
+      }
 
       const { data, error } = await supabase.storage
         .from("employee-photos")
@@ -333,11 +334,7 @@ export function EmployeeForm({
   function removeNote(index: number) {
     setNotes((prev) =>
       prev.map((note, i) =>
-        i === index
-          ? note.id
-            ? { ...note, removed: true }
-            : { ...note, removed: true }
-          : note,
+        i === index ? { ...note, removed: true } : note,
       ),
     );
   }
@@ -473,6 +470,7 @@ export function EmployeeForm({
         await supabase.storage
           .from("employee-photos")
           .remove([currentPhotoPath]);
+
         const { error: clearPhotoError } = await supabase
           .from("employees")
           .update({ photo_path: null })
@@ -491,6 +489,7 @@ export function EmployeeForm({
         }
 
         const photoPath = `${companyId}/${employeeId}/photo-${Date.now()}-${sanitizeFileName(photoFile.name)}`;
+
         const { error: uploadPhotoError } = await supabase.storage
           .from("employee-photos")
           .upload(photoPath, photoFile, {
@@ -535,6 +534,7 @@ export function EmployeeForm({
       if (newDocuments.length > 0) {
         for (const file of newDocuments) {
           const docPath = `${companyId}/${employeeId}/doc-${Date.now()}-${sanitizeFileName(file.name)}`;
+
           const { error: uploadDocError } = await supabase.storage
             .from("employee-documents")
             .upload(docPath, file, { upsert: false });
@@ -619,28 +619,28 @@ export function EmployeeForm({
         <h1 className="text-3xl font-bold">
           {mode === "create" ? "Novo Funcionário" : "Editar Funcionário"}
         </h1>
-        <p className="text-slate-600 mt-2">
+        <p className="mt-2 text-slate-600">
           {mode === "create"
             ? "Cadastre um novo funcionário no sistema."
             : "Atualize os dados do funcionário."}
         </p>
       </div>
 
-      <div className="bg-white border rounded-2xl p-6 space-y-8">
+      <div className="space-y-8 rounded-2xl border bg-white p-6">
         <div>
-          <h2 className="text-xl font-semibold mb-4">Foto do funcionário</h2>
+          <h2 className="mb-4 text-xl font-semibold">Foto do funcionário</h2>
 
-          <div className="flex flex-col gap-4 md:flex-row md:items-start">
-            <div className="h-36 w-36 rounded-2xl border overflow-hidden bg-slate-50 flex items-center justify-center">
+          <div className="flex flex-col gap-5 md:flex-row md:items-start">
+            <div className="flex h-44 w-44 shrink-0 items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm md:h-52 md:w-52">
               {photoPreview && !removeCurrentPhoto ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={photoPreview}
                   alt="Foto do funcionário"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover object-center"
                 />
               ) : (
-                <span className="text-sm text-slate-500 text-center px-3">
+                <span className="px-4 text-center text-sm text-slate-500">
                   Sem foto
                 </span>
               )}
@@ -662,6 +662,11 @@ export function EmployeeForm({
                   className="hidden"
                 />
               </label>
+
+              <p className="text-sm text-slate-500">
+                Tamanho maior para pré-visualização da foto do colaborador.
+              </p>
+
               {photoFile ? (
                 <button
                   type="button"
@@ -687,17 +692,17 @@ export function EmployeeForm({
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-4">Dados pessoais</h2>
-          <div className="grid md:grid-cols-2 gap-4">
+          <h2 className="mb-4 text-xl font-semibold">Dados pessoais</h2>
+          <div className="grid gap-4 md:grid-cols-2">
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Nome completo"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
             />
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="CPF"
               value={cpf}
               onChange={(e) => setCpf(maskCPF(e.target.value))}
@@ -710,14 +715,14 @@ export function EmployeeForm({
               </label>
               <input
                 type="date"
-                className="border rounded-xl px-4 py-3 w-full"
+                className="w-full rounded-xl border px-4 py-3"
                 value={birthDate}
                 onChange={(e) => setBirthDate(e.target.value)}
               />
             </div>
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="RG"
               value={rg}
               onChange={(e) => setRg(e.target.value)}
@@ -725,14 +730,14 @@ export function EmployeeForm({
 
             <input
               type="email"
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Telefone 1"
               value={phone1}
               onChange={(e) => setPhone1(maskPhone(e.target.value))}
@@ -740,7 +745,7 @@ export function EmployeeForm({
             />
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Telefone 2"
               value={phone2}
               onChange={(e) => setPhone2(maskPhone(e.target.value))}
@@ -750,12 +755,12 @@ export function EmployeeForm({
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-4">Endereço</h2>
-          <div className="grid md:grid-cols-2 gap-4">
+          <h2 className="mb-4 text-xl font-semibold">Endereço</h2>
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm text-slate-700">CEP</label>
               <input
-                className="border rounded-xl px-4 py-3 w-full"
+                className="w-full rounded-xl border px-4 py-3"
                 placeholder="00000-000"
                 value={zipCode}
                 onChange={(e) => setZipCode(maskCEP(e.target.value))}
@@ -770,14 +775,14 @@ export function EmployeeForm({
             </div>
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Logradouro"
               value={street}
               onChange={(e) => setStreet(e.target.value)}
             />
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Número"
               value={number}
               onChange={(e) =>
@@ -786,28 +791,28 @@ export function EmployeeForm({
             />
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Complemento"
               value={complement}
               onChange={(e) => setComplement(e.target.value)}
             />
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Bairro"
               value={district}
               onChange={(e) => setDistrict(e.target.value)}
             />
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Cidade"
               value={city}
               onChange={(e) => setCity(e.target.value)}
             />
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="UF"
               value={state}
               onChange={(e) => setState(maskUF(e.target.value))}
@@ -816,18 +821,18 @@ export function EmployeeForm({
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-4">Trabalho</h2>
+          <h2 className="mb-4 text-xl font-semibold">Trabalho</h2>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Função de trabalho"
               value={jobTitle}
               onChange={(e) => setJobTitle(e.target.value)}
             />
 
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Local de trabalho"
               value={workplace}
               onChange={(e) => setWorkplace(e.target.value)}
@@ -837,7 +842,7 @@ export function EmployeeForm({
               <label className="text-sm text-slate-700">Data de admissão</label>
               <input
                 type="date"
-                className="border rounded-xl px-4 py-3 w-full"
+                className="w-full rounded-xl border px-4 py-3"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
@@ -846,7 +851,7 @@ export function EmployeeForm({
             <div className="space-y-2">
               <label className="text-sm text-slate-700">Status</label>
               <select
-                className="border rounded-xl px-4 py-3 w-full"
+                className="w-full rounded-xl border px-4 py-3"
                 value={isActive ? "true" : "false"}
                 onChange={(e) => setIsActive(e.target.value === "true")}
               >
@@ -870,7 +875,7 @@ export function EmployeeForm({
                     onClick={() => toggleWorkDay(day.value)}
                     className={`rounded-xl border px-4 py-2 font-medium ${
                       active
-                        ? "bg-slate-900 text-white border-slate-900"
+                        ? "border-slate-900 bg-slate-900 text-white"
                         : "bg-white text-slate-900"
                     }`}
                   >
@@ -886,14 +891,14 @@ export function EmployeeForm({
           </div>
 
           <div className="mt-6">
-            <h3 className="font-semibold mb-4">Horário</h3>
+            <h3 className="mb-4 font-semibold">Horário</h3>
 
-            <div className="grid md:grid-cols-4 gap-4">
+            <div className="grid gap-4 md:grid-cols-4">
               <div className="space-y-2">
                 <label className="text-sm text-slate-700">Entrada</label>
                 <input
                   type="time"
-                  className="border rounded-xl px-4 py-3 w-full"
+                  className="w-full rounded-xl border px-4 py-3"
                   value={entryTime}
                   onChange={(e) => setEntryTime(e.target.value)}
                 />
@@ -903,7 +908,7 @@ export function EmployeeForm({
                 <label className="text-sm text-slate-700">Saída almoço</label>
                 <input
                   type="time"
-                  className="border rounded-xl px-4 py-3 w-full"
+                  className="w-full rounded-xl border px-4 py-3"
                   value={lunchStartTime}
                   onChange={(e) => setLunchStartTime(e.target.value)}
                 />
@@ -913,7 +918,7 @@ export function EmployeeForm({
                 <label className="text-sm text-slate-700">Retorno almoço</label>
                 <input
                   type="time"
-                  className="border rounded-xl px-4 py-3 w-full"
+                  className="w-full rounded-xl border px-4 py-3"
                   value={lunchEndTime}
                   onChange={(e) => setLunchEndTime(e.target.value)}
                 />
@@ -923,7 +928,7 @@ export function EmployeeForm({
                 <label className="text-sm text-slate-700">Saída</label>
                 <input
                   type="time"
-                  className="border rounded-xl px-4 py-3 w-full"
+                  className="w-full rounded-xl border px-4 py-3"
                   value={exitTime}
                   onChange={(e) => setExitTime(e.target.value)}
                 />
@@ -931,7 +936,7 @@ export function EmployeeForm({
             </div>
           </div>
 
-          <div className="flex gap-6 mt-6">
+          <div className="mt-6 flex gap-6">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -953,40 +958,40 @@ export function EmployeeForm({
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-4">Valores</h2>
-          <div className="grid md:grid-cols-3 gap-4">
+          <h2 className="mb-4 text-xl font-semibold">Valores</h2>
+          <div className="grid gap-4 md:grid-cols-3">
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Salário bruto"
               value={grossSalary}
               onChange={(e) => setGrossSalary(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Salário líquido"
               value={netSalary}
               onChange={(e) => setNetSalary(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="INSS"
               value={inssValue}
               onChange={(e) => setInssValue(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="FGTS"
               value={fgtsValue}
               onChange={(e) => setFgtsValue(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Vale alimentação"
               value={foodAllowance}
               onChange={(e) => setFoodAllowance(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Vale transporte"
               value={transportAllowance}
               onChange={(e) => setTransportAllowance(e.target.value)}
@@ -995,58 +1000,58 @@ export function EmployeeForm({
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-4">Documentos e banco</h2>
-          <div className="grid md:grid-cols-3 gap-4">
+          <h2 className="mb-4 text-xl font-semibold">Documentos e banco</h2>
+          <div className="grid gap-4 md:grid-cols-3">
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="CTPS"
               value={ctps}
               onChange={(e) => setCtps(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="PIS / NIS"
               value={pisNis}
               onChange={(e) => setPisNis(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="CNH"
               value={cnh}
               onChange={(e) => setCnh(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Banco"
               value={bankName}
               onChange={(e) => setBankName(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Agência"
               value={bankAgency}
               onChange={(e) => setBankAgency(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Conta"
               value={bankAccount}
               onChange={(e) => setBankAccount(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="PIX"
               value={pixKey}
               onChange={(e) => setPixKey(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Estado civil"
               value={maritalStatus}
               onChange={(e) => setMaritalStatus(e.target.value)}
             />
             <input
-              className="border rounded-xl px-4 py-3"
+              className="rounded-xl border px-4 py-3"
               placeholder="Escolaridade"
               value={educationLevel}
               onChange={(e) => setEducationLevel(e.target.value)}
@@ -1055,7 +1060,7 @@ export function EmployeeForm({
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-4">Upload de documentos</h2>
+          <h2 className="mb-4 text-xl font-semibold">Upload de documentos</h2>
 
           <label className="inline-flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 hover:bg-slate-50">
             <span className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white">
@@ -1081,7 +1086,7 @@ export function EmployeeForm({
               {newDocuments.map((file, index) => (
                 <div
                   key={`${file.name}-${index}`}
-                  className="border rounded-xl p-3 flex items-center justify-between"
+                  className="flex items-center justify-between rounded-xl border p-3"
                 >
                   <span className="text-sm">{file.name}</span>
                   <button
@@ -1105,12 +1110,12 @@ export function EmployeeForm({
                 return (
                   <div
                     key={doc.id}
-                    className={`border rounded-xl p-3 flex items-center justify-between ${
-                      marked ? "bg-red-50 border-red-200" : ""
+                    className={`flex items-center justify-between rounded-xl border p-3 ${
+                      marked ? "border-red-200 bg-red-50" : ""
                     }`}
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">
+                      <p className="truncate text-sm font-medium">
                         {doc.file_name}
                       </p>
                       <p className="text-xs text-slate-500">
@@ -1133,11 +1138,11 @@ export function EmployeeForm({
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-4">Observações</h2>
+          <h2 className="mb-4 text-xl font-semibold">Observações</h2>
 
-          <div className="flex gap-3 items-start">
+          <div className="flex items-start gap-3">
             <textarea
-              className="w-full border rounded-xl px-4 py-3 min-h-20"
+              className="min-h-20 w-full rounded-xl border px-4 py-3"
               placeholder="Escreva uma observação..."
               value={noteDraft}
               onChange={(e) => setNoteDraft(e.target.value)}
@@ -1145,7 +1150,7 @@ export function EmployeeForm({
             <button
               type="button"
               onClick={addNote}
-              className="border rounded-xl px-4 py-3 whitespace-nowrap"
+              className="whitespace-nowrap rounded-xl border px-4 py-3"
             >
               + Adicionar
             </button>
@@ -1157,13 +1162,13 @@ export function EmployeeForm({
                 note.removed ? null : (
                   <div
                     key={note.id || `new-${index}`}
-                    className="border rounded-xl p-4"
+                    className="rounded-xl border p-4"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="w-full space-y-2">
                         <p className="font-semibold">Obs</p>
                         <textarea
-                          className="w-full border rounded-xl px-4 py-3 min-h-20"
+                          className="min-h-20 w-full rounded-xl border px-4 py-3"
                           value={note.note_text}
                           onChange={(e) => updateNote(index, e.target.value)}
                         />
@@ -1177,7 +1182,7 @@ export function EmployeeForm({
                       <button
                         type="button"
                         onClick={() => removeNote(index)}
-                        className="border rounded-xl px-4 py-2"
+                        className="rounded-xl border px-4 py-2"
                       >
                         Remover
                       </button>
@@ -1186,7 +1191,7 @@ export function EmployeeForm({
                 ),
               )
             ) : (
-              <div className="border rounded-xl p-4 text-slate-500">
+              <div className="rounded-xl border p-4 text-slate-500">
                 Nenhuma observação adicionada.
               </div>
             )}
@@ -1200,7 +1205,7 @@ export function EmployeeForm({
                   note.removed ? (
                     <div
                       key={`removed-${note.id || index}`}
-                      className="border rounded-xl p-3 flex items-center justify-between bg-slate-50"
+                      className="flex items-center justify-between rounded-xl border bg-slate-50 p-3"
                     >
                       <span className="text-sm line-through">
                         {note.note_text || "Observação vazia"}
@@ -1231,7 +1236,7 @@ export function EmployeeForm({
             type="button"
             onClick={saveEmployee}
             disabled={loading}
-            className="bg-slate-900 text-white px-6 py-3 rounded-xl disabled:opacity-60"
+            className="rounded-xl bg-slate-900 px-6 py-3 text-white disabled:opacity-60"
           >
             {loading
               ? "Salvando..."
@@ -1243,7 +1248,7 @@ export function EmployeeForm({
           <button
             type="button"
             onClick={() => router.push("/funcionarios")}
-            className="border px-6 py-3 rounded-xl"
+            className="rounded-xl border px-6 py-3"
           >
             Cancelar
           </button>

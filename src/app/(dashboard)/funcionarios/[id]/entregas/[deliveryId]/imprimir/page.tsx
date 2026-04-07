@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type DeliveryResponse = {
   employee?: {
@@ -11,15 +11,19 @@ type DeliveryResponse = {
   };
   delivery?: {
     id: string;
-    quantity: number;
     note: string | null;
     created_at: string;
-    product?: {
+    items?: Array<{
       id: string;
-      name: string;
-      type: string;
-      unit: string | null;
-    } | null;
+      quantity: number;
+      product?: {
+        id: string;
+        name: string;
+        type: string;
+        unit: string | null;
+        sku?: string | null;
+      } | null;
+    }>;
   };
   error?: string;
 };
@@ -72,6 +76,13 @@ export default function ImprimirEntregaPage({
     void load(employeeId, deliveryId);
   }, [employeeId, deliveryId, load]);
 
+  const totalQuantity = useMemo(() => {
+    return (data?.delivery?.items ?? []).reduce(
+      (total, item) => total + item.quantity,
+      0
+    );
+  }, [data]);
+
   if (loading) {
     return <div className="max-w-4xl mx-auto px-6 py-8">Carregando...</div>;
   }
@@ -82,10 +93,10 @@ export default function ImprimirEntregaPage({
 
   const employee = data.employee;
   const delivery = data.delivery;
-  const product = delivery.product;
+  const items = delivery.items ?? [];
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="print:hidden flex justify-end mb-6">
         <button
           onClick={() => window.print()}
@@ -100,7 +111,7 @@ export default function ImprimirEntregaPage({
           TERMO DE ENTREGA DE EPI / UNIFORME
         </h1>
 
-        <div className="space-y-3 text-base">
+        <div className="grid gap-3 text-base">
           <p>
             <strong>Funcionário:</strong> {employee.name}
           </p>
@@ -115,20 +126,45 @@ export default function ImprimirEntregaPage({
           </p>
 
           <p>
-            <strong>Produto:</strong> {product?.name || "-"}
-          </p>
-
-          <p>
-            <strong>Tipo:</strong> {product?.type || "-"}
-          </p>
-
-          <p>
-            <strong>Quantidade:</strong> {delivery.quantity} {product?.unit || "UN"}
+            <strong>Quantidade total de itens:</strong> {totalQuantity}
           </p>
 
           <p>
             <strong>Observação:</strong> {delivery.note || "-"}
           </p>
+        </div>
+
+        <div className="mt-8 overflow-hidden rounded-xl border">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="px-4 py-3 text-left">Produto</th>
+                <th className="px-4 py-3 text-left">Tipo</th>
+                <th className="px-4 py-3 text-left">CA</th>
+                <th className="px-4 py-3 text-left">Quantidade</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item) => (
+                <tr key={item.id} className="border-t">
+                  <td className="px-4 py-3">{item.product?.name || "-"}</td>
+                  <td className="px-4 py-3">{item.product?.type || "-"}</td>
+                  <td className="px-4 py-3">{item.product?.sku || "-"}</td>
+                  <td className="px-4 py-3">
+                    {item.quantity} {item.product?.unit || "UN"}
+                  </td>
+                </tr>
+              ))}
+
+              {items.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-6 text-center text-slate-500">
+                    Nenhum item encontrado nesta entrega.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
 
         <div className="mt-10 space-y-4 leading-7">

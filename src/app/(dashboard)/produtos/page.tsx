@@ -54,7 +54,9 @@ export default function ProdutosPage() {
   }, [load]);
 
   const lowStockIds = useMemo(() => {
-    return new Set(items.filter((item) => item.stock <= item.min_stock).map((item) => item.id));
+    return new Set(
+      items.filter((item) => item.stock <= item.min_stock).map((item) => item.id)
+    );
   }, [items]);
 
   async function handleDelete(id: string) {
@@ -102,7 +104,7 @@ export default function ProdutosPage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Buscar por nome ou SKU"
+          placeholder="Buscar por nome ou CA"
           className="border rounded-xl px-3 py-2"
         />
 
@@ -147,7 +149,7 @@ export default function ProdutosPage() {
                 <tr>
                   <th className="text-left px-4 py-3">Produto</th>
                   <th className="text-left px-4 py-3">Tipo</th>
-                  <th className="text-left px-4 py-3">SKU</th>
+                  <th className="text-left px-4 py-3">CA</th>
                   <th className="text-left px-4 py-3">Unidade</th>
                   <th className="text-left px-4 py-3">Estoque</th>
                   <th className="text-left px-4 py-3">Status</th>

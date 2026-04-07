@@ -138,7 +138,7 @@ export default function EditarProdutoPage({
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">SKU</label>
+            <label className="block text-sm font-medium mb-1">CA</label>
             <input
               value={form.sku}
               onChange={(e) => setForm((old) => ({ ...old, sku: e.target.value }))}

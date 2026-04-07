@@ -35,10 +35,13 @@ export async function GET(_req: NextRequest, { params }: Params) {
       .select(`
         id,
         company_id,
-        quantity,
         note,
         created_at,
-        product:products(id,name,type,unit)
+        items:delivery_items(
+          id,
+          quantity,
+          product:products(id,name,type,unit)
+        )
       `)
       .eq("employee_id", id)
       .order("created_at", { ascending: false });

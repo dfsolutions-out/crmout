@@ -5,7 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 
 type Movement = {
   id: string;
-  type: string;
+  movement_type?: string;
+  type?: string;
   quantity: number;
   note: string | null;
   created_at: string;
@@ -15,11 +16,11 @@ type Delivery = {
   id: string;
   quantity: number;
   note: string | null;
-  created_at: string;
+  created_at: string | null;
   employee?: {
     id: string;
     name: string;
-  };
+  } | null;
 };
 
 type ProductDetailsResponse = {
@@ -35,6 +36,7 @@ type ProductDetailsResponse = {
   };
   movements: Movement[];
   deliveries: Delivery[];
+  error?: string;
 };
 
 type StockForm = {
@@ -70,7 +72,7 @@ export default function ProdutoDetalhePage({
         cache: "no-store",
       });
 
-      const json: ProductDetailsResponse & { error?: string } = await res.json();
+      const json: ProductDetailsResponse = await res.json();
 
       if (!res.ok) {
         throw new Error(json.error || "Erro ao carregar produto.");
@@ -131,7 +133,7 @@ export default function ProdutoDetalhePage({
     return <div className="max-w-7xl mx-auto px-6 py-8">Carregando...</div>;
   }
 
-  if (!data) {
+  if (!data?.item) {
     return <div className="max-w-7xl mx-auto px-6 py-8">Produto não encontrado.</div>;
   }
 
@@ -158,12 +160,24 @@ export default function ProdutoDetalhePage({
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-2xl border p-5 space-y-3">
           <h2 className="font-semibold text-lg">Informações</h2>
-          <div><strong>SKU:</strong> {item.sku || "-"}</div>
-          <div><strong>Tipo:</strong> {item.type}</div>
-          <div><strong>Unidade:</strong> {item.unit || "-"}</div>
-          <div><strong>Estoque:</strong> {item.stock}</div>
-          <div><strong>Estoque mínimo:</strong> {item.min_stock}</div>
-          <div><strong>Status:</strong> {item.is_active ? "Ativo" : "Inativo"}</div>
+          <div>
+            <strong>CA:</strong> {item.sku || "-"}
+          </div>
+          <div>
+            <strong>Tipo:</strong> {item.type}
+          </div>
+          <div>
+            <strong>Unidade:</strong> {item.unit || "-"}
+          </div>
+          <div>
+            <strong>Estoque:</strong> {item.stock}
+          </div>
+          <div>
+            <strong>Estoque mínimo:</strong> {item.min_stock}
+          </div>
+          <div>
+            <strong>Status:</strong> {item.is_active ? "Ativo" : "Inativo"}
+          </div>
         </div>
 
         <div className="bg-white rounded-2xl border p-5 lg:col-span-2">
@@ -239,7 +253,9 @@ export default function ProdutoDetalhePage({
                     <td className="px-4 py-3">
                       {new Date(movement.created_at).toLocaleString("pt-BR")}
                     </td>
-                    <td className="px-4 py-3">{movement.type}</td>
+                    <td className="px-4 py-3">
+                      {movement.movement_type || movement.type || "-"}
+                    </td>
                     <td className="px-4 py-3">{movement.quantity}</td>
                     <td className="px-4 py-3">{movement.note || "-"}</td>
                   </tr>
@@ -274,12 +290,16 @@ export default function ProdutoDetalhePage({
               </thead>
               <tbody>
                 {deliveries.map((delivery) => (
-                  <tr key={delivery.id} className="border-t">
+                  <tr key={`${delivery.id}-${delivery.created_at ?? ""}`} className="border-t">
                     <td className="px-4 py-3">
-                      {new Date(delivery.created_at).toLocaleString("pt-BR")}
+                      {delivery.created_at
+                        ? new Date(delivery.created_at).toLocaleString("pt-BR")
+                        : "-"}
                     </td>
                     <td className="px-4 py-3">{delivery.employee?.name || "-"}</td>
-                    <td className="px-4 py-3">{delivery.quantity}</td>
+                    <td className="px-4 py-3">
+                      {delivery.quantity} {item.unit || "UN"}
+                    </td>
                     <td className="px-4 py-3">{delivery.note || "-"}</td>
                   </tr>
                 ))}

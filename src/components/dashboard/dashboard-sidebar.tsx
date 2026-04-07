@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   LayoutDashboard,
-  Building2,
   Users,
   Package,
   ClipboardList,
@@ -15,6 +14,7 @@ import {
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
+  Truck,
 } from "lucide-react";
 
 type Props = {
@@ -34,8 +34,8 @@ export default function DashboardSidebar({ children, companyName }: Props) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
-  const sidebarWidth = collapsed ? "w-[92px]" : "w-[278px]";
-  const mainMargin = collapsed ? "md:ml-[92px]" : "md:ml-[278px]";
+  const sidebarWidth = collapsed ? "w-[98px]" : "w-[292px]";
+  const mainMargin = collapsed ? "md:ml-[98px]" : "md:ml-[292px]";
 
   return (
     <div className="min-h-screen bg-[#F3F6FB]">
@@ -47,22 +47,19 @@ export default function DashboardSidebar({ children, companyName }: Props) {
             {!collapsed ? (
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center">
+                  <div className="flex h-24 w-24 shrink-0 items-center justify-center">
                     <Image
                       src="/logo-delta.png"
                       alt="Logo Delta"
-                      width={44}
-                      height={44}
-                      className="h-11 w-11 object-contain"
+                      width={96}
+                      height={96}
+                      className="h-20 w-20 object-contain"
                       priority
                     />
                   </div>
 
-                  <div className="min-w-0 pt-0.5">
-                    <p className="text-[10px] uppercase tracking-[0.24em] text-slate-300">
-                      Empresa
-                    </p>
-                    <h2 className="truncate text-[15px] font-semibold leading-tight text-white">
+                  <div className="min-w-0">
+                    <h2 className="truncate text-[16px] font-semibold text-white">
                       {companyName}
                     </h2>
                   </div>
@@ -80,13 +77,13 @@ export default function DashboardSidebar({ children, companyName }: Props) {
               </div>
             ) : (
               <div className="flex flex-col items-center gap-3">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-white/40 overflow-hidden">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-white/40 overflow-hidden">
                   <Image
                     src="/logo-delta.png"
                     alt="Logo Delta"
-                    width={44}
-                    height={44}
-                    className="h-11 w-11 object-contain"
+                    width={56}
+                    height={56}
+                    className="h-14 w-14 object-contain"
                     priority
                   />
                 </div>
@@ -115,14 +112,6 @@ export default function DashboardSidebar({ children, companyName }: Props) {
               />
 
               <NavItem
-                href="/onboarding"
-                label="Empresa"
-                icon={<Building2 size={18} />}
-                collapsed={collapsed}
-                isActive={pathname === "/onboarding"}
-              />
-
-              <NavItem
                 href="/clientes"
                 label="Clientes"
                 icon={<Users size={18} />}
@@ -140,15 +129,23 @@ export default function DashboardSidebar({ children, companyName }: Props) {
 
               <NavItem
                 href="/produtos"
-                label="Produtos"
+                label="Uniforme / EPI"
                 icon={<Package size={18} />}
                 collapsed={collapsed}
                 isActive={pathname.startsWith("/produtos")}
               />
 
               <NavItem
+                href="/fornecedores"
+                label="Fornecedores"
+                icon={<Truck size={18} />}
+                collapsed={collapsed}
+                isActive={pathname.startsWith("/fornecedores")}
+              />
+
+              <NavItem
                 href="/folha-ponto"
-                label="Folha de ponto"
+                label="Folha de Ponto"
                 icon={<ClipboardList size={18} />}
                 collapsed={collapsed}
                 isActive={pathname.startsWith("/folha-ponto")}

@@ -58,7 +58,9 @@ function text(value: unknown) {
   return String(value);
 }
 
-export default async function FuncionarioPage({ params }: FuncionarioPageProps) {
+export default async function FuncionarioPage({
+  params,
+}: FuncionarioPageProps) {
   const { id } = await params;
   const supabase = await createClient();
 
@@ -165,16 +167,18 @@ export default async function FuncionarioPage({ params }: FuncionarioPageProps) 
       <section className="rounded-[30px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-col gap-5 md:flex-row md:items-center">
-            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-[28px] border border-slate-200 bg-slate-50">
+           <div className="flex h-60 w-60 shrink-0 items-center justify-center overflow-hidden rounded-[28px] border border-slate-200 bg-slate-50 p-2 shadow-sm md:h-48 md:w-48">
               {photoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={photoUrl}
                   alt="Foto do funcionário"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain object-center"
                 />
               ) : (
-                <span className="text-sm text-slate-500">Sem foto</span>
+                <span className="px-3 text-center text-sm text-slate-500">
+                  Sem foto
+                </span>
               )}
             </div>
 
@@ -184,7 +188,7 @@ export default async function FuncionarioPage({ params }: FuncionarioPageProps) 
                 Cadastro do funcionário
               </div>
 
-              <h1 className="text-4xl font-semibold tracking-tight text-slate-900">
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
                 {nomeFuncionario}
               </h1>
 
@@ -215,7 +219,10 @@ export default async function FuncionarioPage({ params }: FuncionarioPageProps) 
               Editar
             </Link>
 
-            <form action={`/funcionarios/${funcionario.id}/excluir`} method="post">
+            <form
+              action={`/funcionarios/${funcionario.id}/excluir`}
+              method="post"
+            >
               <button
                 type="submit"
                 className="inline-flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:opacity-95"
@@ -246,14 +253,23 @@ export default async function FuncionarioPage({ params }: FuncionarioPageProps) 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <InfoItem label="Nome" value={text(funcionario.full_name)} />
           <InfoItem label="CPF" value={text(funcionario.cpf)} />
-          <InfoItem label="Data de nascimento" value={formatDate(funcionario.birth_date)} />
+          <InfoItem
+            label="Data de nascimento"
+            value={formatDate(funcionario.birth_date)}
+          />
           <InfoItem label="RG" value={text(funcionario.rg)} />
           <InfoItem label="Email" value={text(funcionario.email)} />
           <InfoItem label="Telefone 1" value={text(funcionario.phone_1)} />
           <InfoItem label="Telefone 2" value={text(funcionario.phone_2)} />
           <InfoItem label="Status" value={ativo ? "Ativo" : "Inativo"} />
-          <InfoItem label="Estado civil" value={text(funcionario.marital_status)} />
-          <InfoItem label="Escolaridade" value={text(funcionario.education_level)} />
+          <InfoItem
+            label="Estado civil"
+            value={text(funcionario.marital_status)}
+          />
+          <InfoItem
+            label="Escolaridade"
+            value={text(funcionario.education_level)}
+          />
         </div>
       </section>
 
@@ -284,15 +300,31 @@ export default async function FuncionarioPage({ params }: FuncionarioPageProps) 
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <InfoItem label="Função" value={text(funcionario.job_title)} />
-          <InfoItem label="Local de trabalho" value={text(funcionario.workplace)} />
-          <InfoItem label="Data de admissão" value={formatDate(funcionario.start_date)} />
+          <InfoItem
+            label="Local de trabalho"
+            value={text(funcionario.workplace)}
+          />
+          <InfoItem
+            label="Data de admissão"
+            value={formatDate(funcionario.start_date)}
+          />
           <InfoItem
             label="Dias de trabalho"
-            value={Array.isArray(funcionario.work_days) ? funcionario.work_days.join(", ") : "-"}
+            value={
+              Array.isArray(funcionario.work_days)
+                ? funcionario.work_days.join(", ")
+                : "-"
+            }
           />
           <InfoItem label="Entrada" value={text(funcionario.entry_time)} />
-          <InfoItem label="Saída almoço" value={text(funcionario.lunch_start_time)} />
-          <InfoItem label="Retorno almoço" value={text(funcionario.lunch_end_time)} />
+          <InfoItem
+            label="Saída almoço"
+            value={text(funcionario.lunch_start_time)}
+          />
+          <InfoItem
+            label="Retorno almoço"
+            value={text(funcionario.lunch_end_time)}
+          />
           <InfoItem label="Saída" value={text(funcionario.exit_time)} />
           <InfoItem
             label="Insalubridade"
@@ -313,12 +345,24 @@ export default async function FuncionarioPage({ params }: FuncionarioPageProps) 
         />
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          <InfoItem label="Salário bruto" value={money(funcionario.gross_salary)} />
-          <InfoItem label="Salário líquido" value={money(funcionario.net_salary)} />
+          <InfoItem
+            label="Salário bruto"
+            value={money(funcionario.gross_salary)}
+          />
+          <InfoItem
+            label="Salário líquido"
+            value={money(funcionario.net_salary)}
+          />
           <InfoItem label="INSS" value={money(funcionario.inss_value)} />
           <InfoItem label="FGTS" value={money(funcionario.fgts_value)} />
-          <InfoItem label="Vale alimentação" value={money(funcionario.food_allowance)} />
-          <InfoItem label="Vale transporte" value={money(funcionario.transport_allowance)} />
+          <InfoItem
+            label="Vale alimentação"
+            value={money(funcionario.food_allowance)}
+          />
+          <InfoItem
+            label="Vale transporte"
+            value={money(funcionario.transport_allowance)}
+          />
         </div>
       </section>
 
@@ -443,13 +487,7 @@ function SectionHeader({
   );
 }
 
-function InfoItem({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">

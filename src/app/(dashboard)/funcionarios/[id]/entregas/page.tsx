@@ -7,8 +7,6 @@ import { PackageCheck, Plus, Printer, ArrowLeft } from "lucide-react";
 type DeliveryItem = {
   id: string;
   quantity: number;
-  note: string | null;
-  created_at: string;
   product?: {
     id: string;
     name: string;
@@ -17,12 +15,19 @@ type DeliveryItem = {
   } | null;
 };
 
+type DeliveryGroup = {
+  id: string;
+  note: string | null;
+  created_at: string;
+  items?: DeliveryItem[];
+};
+
 type EmployeeDeliveriesResponse = {
   employee?: {
     id: string;
     name: string;
   };
-  items?: DeliveryItem[];
+  items?: DeliveryGroup[];
   error?: string;
 };
 
@@ -94,6 +99,24 @@ export default function EntregasFuncionarioPage({
   const employee = data.employee;
   const items = data.items ?? [];
 
+  function buildItemsSummary(delivery: DeliveryGroup) {
+    const deliveryItems = delivery.items ?? [];
+
+    if (deliveryItems.length === 0) return "-";
+
+    return deliveryItems
+      .map((item) => {
+        const unit = item.product?.unit || "UN";
+        const name = item.product?.name || "Item";
+        return `${item.quantity} ${unit} - ${name}`;
+      })
+      .join(", ");
+  }
+
+  function countTotalQuantity(delivery: DeliveryGroup) {
+    return (delivery.items ?? []).reduce((total, item) => total + item.quantity, 0);
+  }
+
   return (
     <div className="space-y-8">
       <section className="rounded-[30px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
@@ -140,7 +163,7 @@ export default function EntregasFuncionarioPage({
               Lista de entregas
             </h2>
             <p className="mt-1 text-sm text-slate-500">
-              Registros de entrega vinculados a este funcionário.
+              Cada linha representa uma entrega completa, podendo conter vários itens.
             </p>
           </div>
 
@@ -154,39 +177,35 @@ export default function EntregasFuncionarioPage({
             <thead className="bg-slate-50/80">
               <tr className="text-left text-slate-600">
                 <th className="px-4 py-3 font-semibold">Data</th>
-                <th className="px-4 py-3 font-semibold">Produto</th>
-                <th className="px-4 py-3 font-semibold">Tipo</th>
-                <th className="px-4 py-3 font-semibold">Qtd</th>
+                <th className="px-4 py-3 font-semibold">Itens entregues</th>
+                <th className="px-4 py-3 font-semibold">Qtd total</th>
                 <th className="px-4 py-3 font-semibold">Obs</th>
                 <th className="px-4 py-3 text-right font-semibold">Ações</th>
               </tr>
             </thead>
 
             <tbody>
-              {items.map((item) => (
+              {items.map((delivery) => (
                 <tr
-                  key={item.id}
+                  key={delivery.id}
                   className="border-t border-slate-100 transition hover:bg-slate-50/70"
                 >
                   <td className="px-4 py-4 text-slate-600">
-                    {new Date(item.created_at).toLocaleString("pt-BR")}
+                    {new Date(delivery.created_at).toLocaleString("pt-BR")}
                   </td>
                   <td className="px-4 py-4 font-medium text-slate-900">
-                    {item.product?.name || "-"}
+                    {buildItemsSummary(delivery)}
                   </td>
                   <td className="px-4 py-4 text-slate-600">
-                    {item.product?.type || "-"}
-                  </td>
-                  <td className="px-4 py-4 text-slate-600">
-                    {item.quantity} {item.product?.unit || "UN"}
+                    {countTotalQuantity(delivery)}
                   </td>
                   <td className="px-4 py-4 text-slate-500">
-                    {item.note || "-"}
+                    {delivery.note || "-"}
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex justify-end">
                       <Link
-                        href={`/funcionarios/${employee.id}/entregas/${item.id}/imprimir`}
+                        href={`/funcionarios/${employee.id}/entregas/${delivery.id}/imprimir`}
                         className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                       >
                         <Printer className="h-4 w-4" />
@@ -199,7 +218,7 @@ export default function EntregasFuncionarioPage({
 
               {items.length === 0 && (
                 <tr>
-                  <td className="px-4 py-8 text-center text-slate-500" colSpan={6}>
+                  <td className="px-4 py-8 text-center text-slate-500" colSpan={5}>
                     Nenhuma entrega registrada para este funcionário.
                   </td>
                 </tr>
