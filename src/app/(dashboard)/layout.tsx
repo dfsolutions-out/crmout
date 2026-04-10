@@ -17,11 +17,5 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const companyName = "Delta Serviços";
-
-  return (
-    <DashboardSidebar companyName={companyName}>
-      {children}
-    </DashboardSidebar>
-  );
+  return <DashboardSidebar>{children}</DashboardSidebar>;
 }

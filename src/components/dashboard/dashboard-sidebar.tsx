@@ -19,7 +19,6 @@ import {
 
 type Props = {
   children: React.ReactNode;
-  companyName: string;
 };
 
 type NavItemProps = {
@@ -30,7 +29,7 @@ type NavItemProps = {
   isActive: boolean;
 };
 
-export default function DashboardSidebar({ children, companyName }: Props) {
+export default function DashboardSidebar({ children }: Props) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -43,37 +42,33 @@ export default function DashboardSidebar({ children, companyName }: Props) {
         className={`fixed left-0 top-0 z-40 hidden h-screen border-r border-slate-200/50 bg-[#12325F] text-white transition-all duration-300 md:block ${sidebarWidth}`}
       >
         <div className="flex h-full flex-col">
-          <div className="border-b border-white/10 px-4 py-4">
+          <div className="border-b border-white/10 px-4 py-5">
             {!collapsed ? (
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-24 w-24 shrink-0 items-center justify-center">
-                    <Image
-                      src="/logo-delta.png"
-                      alt="Logo Delta"
-                      width={96}
-                      height={96}
-                      className="h-20 w-20 object-contain"
-                      priority
-                    />
-                  </div>
-
-                  <div className="min-w-0">
-                    <h2 className="truncate text-[16px] font-semibold text-white">
-                      {companyName}
-                    </h2>
-                  </div>
-                </div>
-
+              <div className="relative flex flex-col items-center justify-center">
                 <button
                   type="button"
                   onClick={() => setCollapsed(true)}
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-200 transition hover:bg-white/10 hover:text-white"
+                  className="absolute right-0 top-0 inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-200 transition hover:bg-white/10 hover:text-white"
                   aria-label="Recolher menu"
                   title="Recolher menu"
                 >
                   <PanelLeftClose size={18} />
                 </button>
+
+                <div className="flex h-36 w-36 items-center justify-center">
+                  <Image
+                    src="/logo-delta.png"
+                    alt="Logo Delta"
+                    width={160}
+                    height={160}
+                    className="h-32 w-32 object-contain"
+                    priority
+                  />
+                </div>
+
+                <p className="mt-2 text-center text-[16px] font-semibold tracking-wide text-white/80">
+                  CNPJ 03.701.675/0001-56
+                </p>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-3">
@@ -202,7 +197,7 @@ function NavItem({ href, label, icon, collapsed, isActive }: NavItemProps) {
   return (
     <Link
       href={href}
-      className={`group flex items-center rounded-2xl text-sm font-medium transition-all ${
+      className={`group flex items-center rounded-2xl text-[16px] font-semibold transition-all ${
         collapsed ? "justify-center px-0 py-3.5" : "gap-3 px-3.5 py-3"
       } ${
         isActive
