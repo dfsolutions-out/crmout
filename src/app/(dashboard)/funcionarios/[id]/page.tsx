@@ -11,6 +11,7 @@ import {
   FolderOpen,
   FileText,
   Shield,
+  CalendarX2,
 } from "lucide-react";
 
 type FuncionarioPageProps = {
@@ -167,7 +168,7 @@ export default async function FuncionarioPage({
       <section className="rounded-[30px] border border-slate-200 bg-white px-8 py-8 shadow-sm">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-col gap-5 md:flex-row md:items-center">
-           <div className="flex h-60 w-60 shrink-0 items-center justify-center overflow-hidden rounded-[28px] border border-slate-200 bg-slate-50 p-2 shadow-sm md:h-48 md:w-48">
+            <div className="flex h-60 w-60 shrink-0 items-center justify-center overflow-hidden rounded-[28px] border border-slate-200 bg-slate-50 p-2 shadow-sm md:h-48 md:w-48">
               {photoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -381,6 +382,25 @@ export default async function FuncionarioPage({
           <InfoItem label="Agência" value={text(funcionario.bank_agency)} />
           <InfoItem label="Conta" value={text(funcionario.bank_account)} />
           <InfoItem label="PIX" value={text(funcionario.pix_key)} />
+        </div>
+      </section>
+
+      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+        <SectionHeader
+          title="Demissão"
+          description="Informações registradas sobre desligamento do funcionário."
+          icon={<CalendarX2 className="h-5 w-5" />}
+        />
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <InfoItem
+            label="Data da demissão"
+            value={formatDate(funcionario.dismissal_date)}
+          />
+          <InfoItem
+            label="Motivo da demissão"
+            value={text(funcionario.dismissal_reason)}
+          />
         </div>
       </section>
 

@@ -50,6 +50,8 @@ type EmployeeRow = {
   pix_key: string | null;
   marital_status: string | null;
   education_level: string | null;
+  dismissal_date: string | null;
+  dismissal_reason: string | null;
 };
 
 type NoteRow = {
@@ -90,6 +92,7 @@ const DAYS = [
   { value: "SEX", label: "Sex" },
   { value: "SAB", label: "Sáb" },
   { value: "DOM", label: "Dom" },
+  { value: "12X36", label: "12x36" },
 ];
 
 function onlyDigits(value: string) {
@@ -102,6 +105,14 @@ function maskCPF(value: string) {
   if (v.length <= 6) return `${v.slice(0, 3)}.${v.slice(3)}`;
   if (v.length <= 9) return `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6)}`;
   return `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6, 9)}-${v.slice(9, 11)}`;
+}
+
+function maskRG(value: string) {
+  const v = onlyDigits(value).slice(0, 9);
+  if (v.length <= 2) return v;
+  if (v.length <= 5) return `${v.slice(0, 2)}.${v.slice(2)}`;
+  if (v.length <= 8) return `${v.slice(0, 2)}.${v.slice(2, 5)}.${v.slice(5)}`;
+  return `${v.slice(0, 2)}.${v.slice(2, 5)}.${v.slice(5, 8)}-${v.slice(8)}`;
 }
 
 function maskPhone(value: string) {
@@ -119,10 +130,64 @@ function maskCEP(value: string) {
 }
 
 function maskUF(value: string) {
-  return value
-    .replace(/[^a-zA-Z]/g, "")
-    .toUpperCase()
-    .slice(0, 2);
+  return value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 2);
+}
+
+function maskCurrencyBRL(value: string) {
+  const digits = onlyDigits(value);
+  if (!digits) return "";
+
+  const amount = Number(digits) / 100;
+
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(amount);
+}
+
+function currencyToNumber(value: string) {
+  const digits = onlyDigits(value);
+  if (!digits) return 0;
+  return Number(digits) / 100;
+}
+
+function formatInitialCurrency(value: number | null | undefined) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "";
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
+}
+
+function maskCTPS(value: string) {
+  const v = onlyDigits(value).slice(0, 14);
+  if (v.length <= 7) return v;
+  if (v.length <= 11) return `${v.slice(0, 7)} ${v.slice(7)}`;
+  return `${v.slice(0, 7)} ${v.slice(7, 11)} ${v.slice(11, 14)}`;
+}
+
+function maskPISNIS(value: string) {
+  const v = onlyDigits(value).slice(0, 11);
+  if (v.length <= 3) return v;
+  if (v.length <= 8) return `${v.slice(0, 3)}.${v.slice(3)}`;
+  if (v.length <= 10) return `${v.slice(0, 3)}.${v.slice(3, 8)}.${v.slice(8)}`;
+  return `${v.slice(0, 3)}.${v.slice(3, 8)}.${v.slice(8, 10)}-${v.slice(10)}`;
+}
+
+function maskCNH(value: string) {
+  return onlyDigits(value).slice(0, 11);
+}
+
+function maskBankAgency(value: string) {
+  const v = onlyDigits(value).slice(0, 6);
+  if (v.length <= 5) return v;
+  return `${v.slice(0, 5)}-${v.slice(5)}`;
+}
+
+function maskBankAccount(value: string) {
+  const cleaned = value.replace(/[^\dXx]/g, "").toUpperCase().slice(0, 20);
+  if (cleaned.length <= 1) return cleaned;
+  return `${cleaned.slice(0, -1)}-${cleaned.slice(-1)}`;
 }
 
 function sanitizeFileName(name: string) {
@@ -176,28 +241,28 @@ export function EmployeeForm({
   const [exitTime, setExitTime] = useState(initialEmployee?.exit_time || "");
 
   const [grossSalary, setGrossSalary] = useState(
-    String(initialEmployee?.gross_salary ?? ""),
+    formatInitialCurrency(initialEmployee?.gross_salary),
   );
   const [netSalary, setNetSalary] = useState(
-    String(initialEmployee?.net_salary ?? ""),
+    formatInitialCurrency(initialEmployee?.net_salary),
   );
   const [inssValue, setInssValue] = useState(
-    String(initialEmployee?.inss_value ?? ""),
+    formatInitialCurrency(initialEmployee?.inss_value),
   );
   const [fgtsValue, setFgtsValue] = useState(
-    String(initialEmployee?.fgts_value ?? ""),
+    formatInitialCurrency(initialEmployee?.fgts_value),
   );
   const [foodAllowance, setFoodAllowance] = useState(
-    String(initialEmployee?.food_allowance ?? ""),
+    formatInitialCurrency(initialEmployee?.food_allowance),
   );
   const [transportAllowance, setTransportAllowance] = useState(
-    String(initialEmployee?.transport_allowance ?? ""),
+    formatInitialCurrency(initialEmployee?.transport_allowance),
   );
 
   const [ctps, setCtps] = useState(initialEmployee?.ctps || "");
   const [pisNis, setPisNis] = useState(initialEmployee?.pis_nis || "");
   const [cnh, setCnh] = useState(initialEmployee?.cnh || "");
-  const [bankName, setBankName] = useState(initialEmployee?.bank_name || "");
+  const [bankName] = useState(initialEmployee?.bank_name || "BRADESCO");
   const [bankAgency, setBankAgency] = useState(
     initialEmployee?.bank_agency || "",
   );
@@ -210,6 +275,13 @@ export function EmployeeForm({
   );
   const [educationLevel, setEducationLevel] = useState(
     initialEmployee?.education_level || "",
+  );
+
+  const [dismissalDate, setDismissalDate] = useState(
+    initialEmployee?.dismissal_date || "",
+  );
+  const [dismissalReason, setDismissalReason] = useState(
+    initialEmployee?.dismissal_reason || "",
   );
 
   const [isActive, setIsActive] = useState(initialEmployee?.is_active ?? true);
@@ -413,14 +485,12 @@ export function EmployeeForm({
         is_active: isActive,
         receives_insalubrity: receivesInsalubrity,
         receives_danger_pay: receivesDangerPay,
-        gross_salary: grossSalary ? Number(grossSalary) : 0,
-        net_salary: netSalary ? Number(netSalary) : 0,
-        inss_value: inssValue ? Number(inssValue) : 0,
-        fgts_value: fgtsValue ? Number(fgtsValue) : 0,
-        food_allowance: foodAllowance ? Number(foodAllowance) : 0,
-        transport_allowance: transportAllowance
-          ? Number(transportAllowance)
-          : 0,
+        gross_salary: currencyToNumber(grossSalary),
+        net_salary: currencyToNumber(netSalary),
+        inss_value: currencyToNumber(inssValue),
+        fgts_value: currencyToNumber(fgtsValue),
+        food_allowance: currencyToNumber(foodAllowance),
+        transport_allowance: currencyToNumber(transportAllowance),
         ctps: ctps.trim() || null,
         pis_nis: pisNis.trim() || null,
         cnh: cnh.trim() || null,
@@ -430,6 +500,8 @@ export function EmployeeForm({
         pix_key: pixKey.trim() || null,
         marital_status: maritalStatus.trim() || null,
         education_level: educationLevel.trim() || null,
+        dismissal_date: dismissalDate || null,
+        dismissal_reason: dismissalReason.trim() || null,
         created_by: user.id,
       };
 
@@ -725,7 +797,8 @@ export function EmployeeForm({
               className="rounded-xl border px-4 py-3"
               placeholder="RG"
               value={rg}
-              onChange={(e) => setRg(e.target.value)}
+              onChange={(e) => setRg(maskRG(e.target.value))}
+              inputMode="numeric"
             />
 
             <input
@@ -788,6 +861,7 @@ export function EmployeeForm({
               onChange={(e) =>
                 setNumber(onlyDigits(e.target.value).slice(0, 10))
               }
+              inputMode="numeric"
             />
 
             <input
@@ -964,37 +1038,47 @@ export function EmployeeForm({
               className="rounded-xl border px-4 py-3"
               placeholder="Salário bruto"
               value={grossSalary}
-              onChange={(e) => setGrossSalary(e.target.value)}
+              onChange={(e) => setGrossSalary(maskCurrencyBRL(e.target.value))}
+              inputMode="numeric"
             />
             <input
               className="rounded-xl border px-4 py-3"
               placeholder="Salário líquido"
               value={netSalary}
-              onChange={(e) => setNetSalary(e.target.value)}
+              onChange={(e) => setNetSalary(maskCurrencyBRL(e.target.value))}
+              inputMode="numeric"
             />
             <input
               className="rounded-xl border px-4 py-3"
               placeholder="INSS"
               value={inssValue}
-              onChange={(e) => setInssValue(e.target.value)}
+              onChange={(e) => setInssValue(maskCurrencyBRL(e.target.value))}
+              inputMode="numeric"
             />
             <input
               className="rounded-xl border px-4 py-3"
               placeholder="FGTS"
               value={fgtsValue}
-              onChange={(e) => setFgtsValue(e.target.value)}
+              onChange={(e) => setFgtsValue(maskCurrencyBRL(e.target.value))}
+              inputMode="numeric"
             />
             <input
               className="rounded-xl border px-4 py-3"
               placeholder="Vale alimentação"
               value={foodAllowance}
-              onChange={(e) => setFoodAllowance(e.target.value)}
+              onChange={(e) =>
+                setFoodAllowance(maskCurrencyBRL(e.target.value))
+              }
+              inputMode="numeric"
             />
             <input
               className="rounded-xl border px-4 py-3"
               placeholder="Vale transporte"
               value={transportAllowance}
-              onChange={(e) => setTransportAllowance(e.target.value)}
+              onChange={(e) =>
+                setTransportAllowance(maskCurrencyBRL(e.target.value))
+              }
+              inputMode="numeric"
             />
           </div>
         </div>
@@ -1006,37 +1090,41 @@ export function EmployeeForm({
               className="rounded-xl border px-4 py-3"
               placeholder="CTPS"
               value={ctps}
-              onChange={(e) => setCtps(e.target.value)}
+              onChange={(e) => setCtps(maskCTPS(e.target.value))}
+              inputMode="numeric"
             />
             <input
               className="rounded-xl border px-4 py-3"
               placeholder="PIS / NIS"
               value={pisNis}
-              onChange={(e) => setPisNis(e.target.value)}
+              onChange={(e) => setPisNis(maskPISNIS(e.target.value))}
+              inputMode="numeric"
             />
             <input
               className="rounded-xl border px-4 py-3"
               placeholder="CNH"
               value={cnh}
-              onChange={(e) => setCnh(e.target.value)}
+              onChange={(e) => setCnh(maskCNH(e.target.value))}
+              inputMode="numeric"
             />
             <input
-              className="rounded-xl border px-4 py-3"
+              className="rounded-xl border bg-slate-50 px-4 py-3"
               placeholder="Banco"
               value={bankName}
-              onChange={(e) => setBankName(e.target.value)}
+              readOnly
             />
             <input
               className="rounded-xl border px-4 py-3"
               placeholder="Agência"
               value={bankAgency}
-              onChange={(e) => setBankAgency(e.target.value)}
+              onChange={(e) => setBankAgency(maskBankAgency(e.target.value))}
+              inputMode="numeric"
             />
             <input
               className="rounded-xl border px-4 py-3"
               placeholder="Conta"
               value={bankAccount}
-              onChange={(e) => setBankAccount(e.target.value)}
+              onChange={(e) => setBankAccount(maskBankAccount(e.target.value))}
             />
             <input
               className="rounded-xl border px-4 py-3"
@@ -1222,6 +1310,34 @@ export function EmployeeForm({
                 )}
               </div>
             ) : null}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="mb-4 text-xl font-semibold">Demissão</h2>
+
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm text-slate-700">Data da demissão</label>
+                <input
+                  type="date"
+                  className="w-full rounded-xl border px-4 py-3"
+                  value={dismissalDate}
+                  onChange={(e) => setDismissalDate(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm text-slate-700">Motivo da demissão</label>
+              <textarea
+                className="min-h-24 w-full rounded-xl border px-4 py-3"
+                placeholder="Descreva o motivo da demissão..."
+                value={dismissalReason}
+                onChange={(e) => setDismissalReason(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
